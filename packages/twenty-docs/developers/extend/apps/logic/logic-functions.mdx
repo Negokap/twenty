@@ -895,7 +895,7 @@ const handler = async (params: { parentMessageId?: string }) => {
 
 Declare a health check with `defineHealthCheck` to report whether your app is actually able to run. It is for what only the app can know: a key that is present but revoked, an account on the wrong plan, a webhook that was never registered. What Twenty can see by itself — a required variable nobody filled in — is covered by [`isRequired`](/developers/extend/apps/config/application) and needs no code.
 
-It runs server-side, so it reads secret variables like any other logic function. The handler takes no arguments.
+It runs server-side, so it reads secret variables like any other logic function. A workspace check has nobody behind it, so the handler needs no arguments.
 
 ```ts src/logic-functions/health-check.ts
 import { defineHealthCheck } from 'twenty-sdk/define';
@@ -948,7 +948,45 @@ A check that throws, times out or returns a shape Twenty cannot read is treated 
 
 The location has to stay inside Twenty, so it starts with `/` or `#`: an external, protocol-relative or relative one loses its button rather than becoming a redirect somewhere else. The button is also dropped when the app reports no location and has no configuration tab to fall back to, so a check on an app with no variables and no settings menu items shows its title without a dead button.
 
-Only one health check is allowed per app; declaring more than one fails the build.
+### Checking each member's own setup
+
+A health check is `WORKSPACE`-scoped by default and shows on the app's settings page. Set `scope: 'USER'` to check what each member set up for themselves, such as their own connection:
+
+```ts src/logic-functions/my-account-health-check.ts
+import { defineHealthCheck } from 'twenty-sdk/define';
+import { listConnections } from 'twenty-sdk/logic-function';
+
+export default defineHealthCheck({
+  universalIdentifier: 'b7d2e1f4-3a6c-4d8e-9f0a-1c2b3d4e5f60',
+  name: 'my-account-health-check',
+  scope: 'USER',
+  handler: async (_payload, { userWorkspaceId }) => {
+    if (userWorkspaceId === null) {
+      return { status: 'OK' };
+    }
+
+    const [myConnection] = await listConnections({
+      scope: 'USER',
+      userWorkspaceId,
+    });
+
+    if (myConnection === undefined || myConnection.authFailedAt !== null) {
+      return { status: 'WARNING', title: 'Connect your account' };
+    }
+
+    return { status: 'OK' };
+  },
+});
+```
+
+A `USER` check runs when a member opens the app on their **Apps preferences** page, and only that member sees its banner. It runs as that member: the handler's second argument, the [execution context](#execution-context), carries their `userWorkspaceId` and `workspaceMemberId`, and user-scoped variables hold their values. Pass `userWorkspaceId` to `listConnections()` so it returns that member's connections only. A connection whose token refresh fails is left out of the list, so "no connection" covers "reconnect" too. A button with no `location` lands on the app's General tab of that page.
+
+<Note>
+  **Apps preferences** is not enabled in every workspace yet: where it is not, a
+  `USER` check never runs.
+</Note>
+
+An app can declare one health check per scope; two with the same scope fail the build.
 
 ## Create a timeline activity
 

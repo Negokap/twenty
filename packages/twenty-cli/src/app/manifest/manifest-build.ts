@@ -56,6 +56,8 @@ import {
   type PreInstallLogicFunctionApplicationManifest,
   type UninstallLogicFunctionApplicationManifest,
   type HealthCheckLogicFunctionApplicationManifest,
+  type HealthCheckScope,
+  HEALTH_CHECK_SCOPES,
   type RoleManifest,
   type SkillManifest,
   type StandalonePageLayoutWidgetManifest,
@@ -135,10 +137,9 @@ export const buildManifest = async (
     [];
   const uninstallLogicFunctions: UninstallLogicFunctionApplicationManifest[] =
     [];
-  const healthCheckLogicFunctions: HealthCheckLogicFunctionApplicationManifest[] =
-    [];
-  const userHealthCheckLogicFunctions: HealthCheckLogicFunctionApplicationManifest[] =
-    [];
+  const healthCheckLogicFunctions: (HealthCheckLogicFunctionApplicationManifest & {
+    scope: HealthCheckScope;
+  })[] = [];
   const settingsFrontComponentUniversalIdentifiers: string[] = [];
   const applicationRoleUniversalIdentifiers: string[] = [];
   const applicationFilePaths: string[] = [];
@@ -375,15 +376,13 @@ export const buildManifest = async (
         }
 
         if (targetFunctionName === 'defineHealthCheck') {
-          const healthCheck = {
+          healthCheckLogicFunctions.push({
             universalIdentifier: extract.config.universalIdentifier,
-          };
-
-          if ('scope' in extract.config && extract.config.scope === 'USER') {
-            userHealthCheckLogicFunctions.push(healthCheck);
-          } else {
-            healthCheckLogicFunctions.push(healthCheck);
-          }
+            scope:
+              'scope' in extract.config && extract.config.scope === 'USER'
+                ? 'USER'
+                : 'WORKSPACE',
+          });
         }
 
         break;
@@ -622,13 +621,24 @@ export const buildManifest = async (
     errors.push('Only one uninstall logic function is allowed per application');
   }
 
-  if (healthCheckLogicFunctions.length > 1) {
-    errors.push('Only one WORKSPACE health check is allowed per application');
+  const findHealthCheckLogicFunctions = (
+    scope: HealthCheckScope,
+  ): HealthCheckLogicFunctionApplicationManifest[] =>
+    healthCheckLogicFunctions
+      .filter(
+        (healthCheckLogicFunction) => healthCheckLogicFunction.scope === scope,
+      )
+      .map(({ universalIdentifier }) => ({ universalIdentifier }));
+
+  for (const scope of HEALTH_CHECK_SCOPES) {
+    if (findHealthCheckLogicFunctions(scope).length > 1) {
+      errors.push(`Only one ${scope} health check is allowed per application`);
+    }
   }
 
-  if (userHealthCheckLogicFunctions.length > 1) {
-    errors.push('Only one USER health check is allowed per application');
-  }
+  const [workspaceHealthCheckLogicFunction] =
+    findHealthCheckLogicFunctions('WORKSPACE');
+  const [userHealthCheckLogicFunction] = findHealthCheckLogicFunctions('USER');
 
   if (settingsFrontComponentUniversalIdentifiers.length > 1) {
     errors.push('Only one settings front component is allowed per application');
@@ -707,14 +717,11 @@ export const buildManifest = async (
             ...(uninstallLogicFunctions.length >= 1
               ? { uninstallLogicFunction: uninstallLogicFunctions[0] }
               : {}),
-            ...(healthCheckLogicFunctions.length >= 1
-              ? { healthCheckLogicFunction: healthCheckLogicFunctions[0] }
+            ...(isDefined(workspaceHealthCheckLogicFunction)
+              ? { healthCheckLogicFunction: workspaceHealthCheckLogicFunction }
               : {}),
-            ...(userHealthCheckLogicFunctions.length >= 1
-              ? {
-                  userHealthCheckLogicFunction:
-                    userHealthCheckLogicFunctions[0],
-                }
+            ...(isDefined(userHealthCheckLogicFunction)
+              ? { userHealthCheckLogicFunction }
               : {}),
             ...(settingsFrontComponentUniversalIdentifiers.length >= 1
               ? {
