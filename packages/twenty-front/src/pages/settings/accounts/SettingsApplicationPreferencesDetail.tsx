@@ -1,14 +1,15 @@
 import { getApplicationDisplayName } from '@/applications/utils/getApplicationDisplayName';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { SettingsAppPreferencesGeneralTab } from '@/settings/app-preferences/components/SettingsAppPreferencesGeneralTab';
-import { SettingsApplicationPreferencesHealthBanner } from '@/settings/app-preferences/components/SettingsApplicationPreferencesHealthBanner';
-import { SettingsApplicationPreferencesHealthCheckEffect } from '@/settings/app-preferences/components/SettingsApplicationPreferencesHealthCheckEffect';
 import { APPLICATION_PREFERENCES_GENERAL_TAB_ID } from '@/settings/app-preferences/constants/ApplicationPreferencesGeneralTabId';
+import { MY_APPLICATION_HEALTH_CHECK_RUNNER } from '@/settings/app-preferences/constants/MyApplicationHealthCheckRunner';
 import { SETTINGS_APPLICATION_PREFERENCES_TAB_LIST_COMPONENT_ID } from '@/settings/app-preferences/constants/SettingsApplicationPreferencesTabListComponentId';
-import { useSaveMyApplicationVariablesAndRecheckHealth } from '@/settings/app-preferences/hooks/useSaveMyApplicationVariablesAndRecheckHealth';
 import { type ApplicationWithPreferences } from '@/settings/app-preferences/types/ApplicationWithPreferences';
 import { getApplicationPreferencesGeneralPath } from '@/settings/app-preferences/utils/getApplicationPreferencesGeneralPath';
+import { SettingsApplicationHealthCheckBanner } from '@/settings/applications/components/SettingsApplicationHealthCheckBanner';
+import { SettingsApplicationHealthCheckEffect } from '@/settings/applications/components/SettingsApplicationHealthCheckEffect';
 import { APPLICATION_VARIABLES_TAB_ID } from '@/settings/applications/constants/ApplicationVariablesTabId';
+import { useSaveApplicationVariablesAndRecheckHealth } from '@/settings/applications/hooks/useSaveApplicationVariablesAndRecheckHealth';
 import { getApplicationConfigurationTabId } from '@/settings/applications/utils/getApplicationConfigurationTabId';
 import { hasApplicationVariablesTab } from '@/settings/applications/utils/hasApplicationVariablesTab';
 import { useSettingsActiveTabId } from '@/settings/components/layout/useSettingsActiveTabId';
@@ -91,9 +92,10 @@ export const SettingsApplicationPreferencesDetail = ({
   const hasMissingRequiredVariables = isNonEmptyArray(missingRequiredVariables);
 
   const { saveApplicationVariablesAndRecheckHealth } =
-    useSaveMyApplicationVariablesAndRecheckHealth({
+    useSaveApplicationVariablesAndRecheckHealth({
       applicationId: application.id,
-      hasUserHealthCheck,
+      runner: MY_APPLICATION_HEALTH_CHECK_RUNNER,
+      hasHealthCheck: hasUserHealthCheck,
       hasMissingRequiredVariables,
       saveApplicationVariables,
     });
@@ -197,12 +199,16 @@ export const SettingsApplicationPreferencesDetail = ({
         )}
       {hasUserHealthCheck && !hasMissingRequiredVariables && (
         <>
-          <SettingsApplicationPreferencesHealthCheckEffect
+          <SettingsApplicationHealthCheckEffect
             key={application.id}
             applicationId={application.id}
+            runner={MY_APPLICATION_HEALTH_CHECK_RUNNER}
           />
-          <SettingsApplicationPreferencesHealthBanner
+          <SettingsApplicationHealthCheckBanner
             applicationId={application.id}
+            healthCheckFamilyState={
+              MY_APPLICATION_HEALTH_CHECK_RUNNER.healthCheckFamilyState
+            }
             fallbackLocation={
               activeTabId === APPLICATION_PREFERENCES_GENERAL_TAB_ID
                 ? undefined

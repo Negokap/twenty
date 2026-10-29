@@ -1,28 +1,31 @@
-import { myApplicationHealthCheckFamilyState } from '@/settings/app-preferences/states/myApplicationHealthCheckFamilyState';
 import { SettingsApplicationHealthBanner } from '@/settings/applications/components/SettingsApplicationHealthBanner';
+import { type ApplicationHealthCheckState } from '@/settings/applications/types/ApplicationHealthCheckState';
 import { getApplicationHealthBanner } from '@/settings/applications/utils/getApplicationHealthBanner';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
+import { type FamilyState } from '@/ui/utilities/state/jotai/types/FamilyState';
 import { useNavigate } from 'react-router-dom';
 import { isDefined } from 'twenty-shared/utils';
 
-type SettingsApplicationPreferencesHealthBannerProps = {
+type SettingsApplicationHealthCheckBannerProps = {
   applicationId: string;
+  healthCheckFamilyState: FamilyState<ApplicationHealthCheckState, string>;
   fallbackLocation?: string;
 };
 
-export const SettingsApplicationPreferencesHealthBanner = ({
+export const SettingsApplicationHealthCheckBanner = ({
   applicationId,
+  healthCheckFamilyState,
   fallbackLocation,
-}: SettingsApplicationPreferencesHealthBannerProps) => {
+}: SettingsApplicationHealthCheckBannerProps) => {
   const navigate = useNavigate();
 
-  const { result: myApplicationHealthCheckResult } = useAtomFamilyStateValue(
-    myApplicationHealthCheckFamilyState,
+  const { result } = useAtomFamilyStateValue(
+    healthCheckFamilyState,
     applicationId,
   );
 
   const healthBanner = getApplicationHealthBanner({
-    healthCheckResult: myApplicationHealthCheckResult,
+    healthCheckResult: result,
     fallbackLocation,
   });
 

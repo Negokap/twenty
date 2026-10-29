@@ -101,10 +101,16 @@ const USER_SETTINGS_MENU_ITEM = buildSettingsMenuItem({
   scope: 'USER',
 });
 
+const runApplicationHealthCheck = fn();
+
+const HEALTH_CHECK_LOGIC_FUNCTION_ID = '20202020-6a7b-4c3d-8e4f-000000000021';
+
 const buildApplicationHandlers = ({
   settingsMenuItems,
+  healthCheckLogicFunctionId = null,
 }: {
   settingsMenuItems: ReturnType<typeof buildSettingsMenuItem>[];
+  healthCheckLogicFunctionId?: string | null;
 }) => [
   graphql.query('FindOneApplication', () =>
     HttpResponse.json({
@@ -124,7 +130,7 @@ const buildApplicationHandlers = ({
           autoUpgrade: false,
           defaultRoleId: null,
           settingsCustomTabFrontComponentId: null,
-          healthCheckLogicFunctionId: null,
+          healthCheckLogicFunctionId,
           availablePackages: {},
           applicationVariables: [USER_VARIABLE, buildWorkspaceVariable()],
           agents: [],
@@ -153,6 +159,21 @@ const buildApplicationHandlers = ({
       data: { updateOneApplicationVariable: true },
     });
   }),
+  graphql.mutation('RunApplicationHealthCheck', ({ variables }) => {
+    runApplicationHealthCheck(variables);
+
+    return HttpResponse.json({
+      data: {
+        runApplicationHealthCheck: {
+          __typename: 'ApplicationHealthCheckResult',
+          status: 'WARNING',
+          title: 'Your recorder plan is almost used up',
+          description: null,
+          action: null,
+        },
+      },
+    });
+  }),
   ...graphqlMocks.handlers,
 ];
 
@@ -167,6 +188,7 @@ const meta: Meta<PageDecoratorArgs> = {
   beforeEach: async () => {
     savedValueByKey.clear();
     updateOneApplicationVariable.mockClear();
+    runApplicationHealthCheck.mockClear();
     await mockedApolloClient.clearStore();
   },
   parameters: {
@@ -264,6 +286,62 @@ export const VariablesTabSavesWorkspaceVariable: Story = {
     );
     await waitFor(() => expect(saveButton).toBeDisabled());
     expect(canvas.getByDisplayValue('https://new.example.com')).toBeVisible();
+  },
+};
+
+export const WorkspaceHealthCheckRunsOnOpenAndAfterSave: Story = {
+  parameters: {
+    msw: {
+      handlers: buildApplicationHandlers({
+        settingsMenuItems: [USER_SETTINGS_MENU_ITEM],
+        healthCheckLogicFunctionId: HEALTH_CHECK_LOGIC_FUNCTION_ID,
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(
+      await canvas.findByText(
+        'Your recorder plan is almost used up',
+        undefined,
+        {
+          timeout: 3000,
+        },
+      ),
+    ).toBeVisible();
+    expect(runApplicationHealthCheck.mock.calls).toEqual([
+      [{ applicationId: APPLICATION_ID }],
+    ]);
+
+    await userEvent.click(canvas.getByRole('link', { name: 'Variables' }));
+
+    const saveButton = await canvas.findByRole('button', {
+      name: 'Save settings',
+    });
+    const workspaceUrlInput = await canvas.findByDisplayValue(
+      'https://recorder.example.com',
+    );
+
+    await userEvent.clear(workspaceUrlInput);
+    await userEvent.type(workspaceUrlInput, 'https://new.example.com');
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    await userEvent.click(saveButton);
+
+    await waitFor(() =>
+      expect(runApplicationHealthCheck).toHaveBeenCalledTimes(2),
+    );
+    await waitFor(() => expect(saveButton).toBeDisabled());
+
+    await userEvent.click(canvas.getByRole('link', { name: 'General' }));
+
+    expect(
+      await canvas.findByText('Your recorder plan is almost used up'),
+    ).toBeVisible();
+    expect(runApplicationHealthCheck.mock.calls).toEqual([
+      [{ applicationId: APPLICATION_ID }],
+      [{ applicationId: APPLICATION_ID }],
+    ]);
   },
 };
 
