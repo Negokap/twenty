@@ -3,7 +3,7 @@ import { type Request } from 'express';
 
 import { isUserSessionToken } from 'src/engine/core-modules/user-session/utils/is-user-session-token.util';
 
-const readCookieValue = (
+export const readCookieValue = (
   cookieHeader: string,
   cookieName: string,
 ): string | undefined => {

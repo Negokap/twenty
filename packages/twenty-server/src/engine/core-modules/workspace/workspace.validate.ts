@@ -23,6 +23,7 @@ const isAuthEnabledOrThrow = (
   if (provider === AuthProviderEnum.Password && workspace.isPasswordAuthEnabled)
     return true;
   if (provider === AuthProviderEnum.SSO) return true;
+  if (provider === AuthProviderEnum.Setjoo) return true;
 
   throw exceptionToThrowCustom;
 };
@@ -40,6 +41,8 @@ const isAuthEnabled = (
     return true;
   if (provider === AuthProviderEnum.Password && workspace.isPasswordAuthEnabled)
     return true;
+  // Setjoo has no workspace toggle: AUTH_SETJOO_ENABLED gates it instance-wide
+  if (provider === AuthProviderEnum.Setjoo) return true;
 
   return false;
 };
