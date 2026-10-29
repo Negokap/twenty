@@ -13,6 +13,7 @@ export const mockedClientConfig: ClientConfig = {
     magicLink: false,
     password: true,
     microsoft: false,
+    setjoo: false,
     sso: [],
   },
   frontDomain: 'localhost',

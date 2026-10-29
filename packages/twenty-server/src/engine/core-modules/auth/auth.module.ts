@@ -15,6 +15,7 @@ import { GoogleAuthController } from 'src/engine/core-modules/auth/controllers/g
 import { MicrosoftAPIsAuthController } from 'src/engine/core-modules/auth/controllers/microsoft-apis-auth.controller';
 import { MicrosoftAuthController } from 'src/engine/core-modules/auth/controllers/microsoft-auth.controller';
 import { OAuthPropagatorController } from 'src/engine/core-modules/auth/controllers/oauth-propagator.controller';
+import { SetjooAuthController } from 'src/engine/core-modules/auth/controllers/setjoo-auth.controller';
 import { SsoAuthController } from 'src/engine/core-modules/auth/controllers/sso-auth.controller';
 import { AuthSsoService } from 'src/engine/core-modules/auth/services/auth-sso.service';
 import { ConnectedAccountOAuthService } from 'src/engine/core-modules/auth/services/connected-account-oauth.service';
@@ -27,6 +28,7 @@ import { GoogleApisServiceAvailabilityService } from 'src/engine/core-modules/au
 import { GoogleAPIsService } from 'src/engine/core-modules/auth/services/google-apis.service';
 import { MicrosoftAPIsService } from 'src/engine/core-modules/auth/services/microsoft-apis.service';
 import { ResetPasswordService } from 'src/engine/core-modules/auth/services/reset-password.service';
+import { SetjooAuthService } from 'src/engine/core-modules/auth/services/setjoo-auth.service';
 import { SignInUpService } from 'src/engine/core-modules/auth/services/sign-in-up.service';
 import { UpdateConnectedAccountOnReconnectService } from 'src/engine/core-modules/auth/services/update-connected-account-on-reconnect.service';
 import { SamlAuthStrategy } from 'src/engine/core-modules/auth/strategies/saml.auth.strategy';
@@ -128,6 +130,7 @@ import { AuthService } from './services/auth.service';
   controllers: [
     GoogleAuthController,
     MicrosoftAuthController,
+    SetjooAuthController,
     GoogleAPIsAuthController,
     MicrosoftAPIsAuthController,
     OAuthPropagatorController,
@@ -145,6 +148,7 @@ import { AuthService } from './services/auth.service';
     GoogleApiScopesService,
     GoogleApisServiceAvailabilityService,
     MicrosoftAPIsService,
+    SetjooAuthService,
     ResetPasswordService,
     // TODO: move these calendar, message and connected account services to business modules once they can hold controllers
     CreateMessageChannelService,

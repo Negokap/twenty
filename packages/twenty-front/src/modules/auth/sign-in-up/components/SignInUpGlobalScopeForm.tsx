@@ -12,6 +12,7 @@ import { StyledOnboardingContentContainer } from '@/auth/components/StyledOnboar
 import { SignInUpWithCredentials } from '@/auth/sign-in-up/components/internal/SignInUpWithCredentials';
 import { SignInUpWithGoogle } from '@/auth/sign-in-up/components/internal/SignInUpWithGoogle';
 import { SignInUpWithMicrosoft } from '@/auth/sign-in-up/components/internal/SignInUpWithMicrosoft';
+import { SignInUpWithSetjoo } from '@/auth/sign-in-up/components/internal/SignInUpWithSetjoo';
 import { useHandleResetPassword } from '@/auth/sign-in-up/hooks/useHandleResetPassword';
 import { useSignInUpForm } from '@/auth/sign-in-up/hooks/useSignInUpForm';
 import {
@@ -237,6 +238,12 @@ export const SignInUpGlobalScopeForm = () => {
       )}
       {signInUpStep !== SignInUpStep.WorkspaceSelection && (
         <StyledOnboardingContentContainer>
+          {authProviders.setjoo && (
+            <SignInUpWithSetjoo
+              action="list-available-workspaces"
+              isGlobalScope
+            />
+          )}
           {authProviders.google && (
             <SignInUpWithGoogle
               action="list-available-workspaces"
@@ -249,7 +256,9 @@ export const SignInUpGlobalScopeForm = () => {
               isGlobalScope
             />
           )}
-          {(authProviders.google || authProviders.microsoft) && (
+          {(authProviders.setjoo ||
+            authProviders.google ||
+            authProviders.microsoft) && (
             <Separator style={{ marginBlock: themeCssVariables.spacing[3] }} />
           )}
           {/* oxlint-disable-next-line react/jsx-props-no-spreading */}

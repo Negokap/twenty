@@ -326,6 +326,44 @@ export class ConfigVariables {
   @ValidateIf((env) => env.AUTH_MICROSOFT_ENABLED)
   AUTH_MICROSOFT_APIS_CALLBACK_URL: string;
 
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description: 'Enable or disable Sign in with Setjoo (Setjoo Identity OIDC)',
+    type: ConfigVariableType.BOOLEAN,
+  })
+  @IsOptional()
+  AUTH_SETJOO_ENABLED = false;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    isSensitive: false,
+    description: 'Public issuer URL of Setjoo Identity',
+    type: ConfigVariableType.STRING,
+  })
+  @IsUrl({ require_tld: false, require_protocol: true })
+  @ValidateIf((env) => env.AUTH_SETJOO_ENABLED)
+  AUTH_SETJOO_ISSUER = 'https://auth.setjoo.com';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    isSensitive: false,
+    description: 'Public client ID registered on Setjoo Identity',
+    type: ConfigVariableType.STRING,
+  })
+  @ValidateIf((env) => env.AUTH_SETJOO_ENABLED)
+  AUTH_SETJOO_CLIENT_ID = 'setjoo-crm';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    isSensitive: false,
+    description:
+      'Redirect URI registered on Setjoo Identity, must be <SERVER_URL>/oauth/callback',
+    type: ConfigVariableType.STRING,
+  })
+  @IsUrl({ require_tld: false, require_protocol: true })
+  @ValidateIf((env) => env.AUTH_SETJOO_ENABLED)
+  AUTH_SETJOO_CALLBACK_URL: string;
+
   /**
    * @deprecated Use is now GA - record page layouts are always seeded
    */

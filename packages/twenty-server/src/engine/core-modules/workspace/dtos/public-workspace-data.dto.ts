@@ -42,6 +42,9 @@ export class AuthProvidersDTO {
 
   @Field(() => Boolean)
   microsoft: boolean;
+
+  @Field(() => Boolean)
+  setjoo: boolean;
 }
 
 @ObjectType('AuthBypassProviders')
