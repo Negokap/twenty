@@ -155,7 +155,7 @@ export const CreateProfile = () => {
               lastName: data.lastName,
             },
             jobTitle: data.jobTitle,
-            colorScheme: doNotTranslate('System'),
+            colorScheme: doNotTranslate('Light'),
           },
         });
 
@@ -169,7 +169,7 @@ export const CreateProfile = () => {
                     lastName: data.lastName,
                   },
                   jobTitle: data.jobTitle,
-                  colorScheme: doNotTranslate('System'),
+                  colorScheme: doNotTranslate('Light'),
                 }
               : member,
           ),

@@ -29,11 +29,13 @@ import {
   IconPlus,
   IconSettings,
   IconSwitchHorizontal,
+  IconUserCircle,
   IconUserPlus,
 } from 'twenty-ui/icon';
 import { Avatar } from 'twenty-ui/primitives/data-display';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
+import { openUrlInNewTab } from '~/utils/openUrlInNewTab';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 export const MultiWorkspaceDropdownDefaultComponents = () => {
@@ -109,6 +111,12 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
                   {t`Create Workspace`}
                 </Dropdown.ActionItem>
               )}
+              <Dropdown.ActionItem
+                startIcon={<IconUserCircle />}
+                onClick={() => openUrlInNewTab('https://auth.setjoo.com/')}
+              >
+                {t`Manage Setjoo account`}
+              </Dropdown.ActionItem>
               <Dropdown.ActionItem startIcon={<IconLogout />} onClick={signOut}>
                 {t`Log out`}
               </Dropdown.ActionItem>

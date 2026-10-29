@@ -19,17 +19,17 @@ describe('getTwentyWebsiteUrl', () => {
     ['zh-TW', 'zh'],
   ])('uses the localized Twenty website path for %s', (locale, language) => {
     expect(getTwentyWebsiteUrl(locale, 'privacy-policy')).toBe(
-      `https://twenty.com/${language}/privacy-policy`,
+      `https://setjoo.com/${language}/privacy-policy`,
     );
   });
 
   it('uses the default Twenty website path for English', () => {
-    expect(getTwentyWebsiteUrl('en', 'terms')).toBe('https://twenty.com/terms');
+    expect(getTwentyWebsiteUrl('en', 'terms')).toBe('https://setjoo.com/terms');
   });
 
   it('uses English for the pseudo locale', () => {
     expect(getTwentyWebsiteUrl('pseudo-en', 'terms')).toBe(
-      'https://twenty.com/terms',
+      'https://setjoo.com/terms',
     );
   });
 });

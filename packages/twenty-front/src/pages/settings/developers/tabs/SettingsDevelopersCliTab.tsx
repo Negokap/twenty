@@ -16,7 +16,7 @@ import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { openUrlInNewTab } from '~/utils/openUrlInNewTab';
 
 const CLI_COMMAND_REFERENCE_URL =
-  'https://github.com/twentyhq/twenty/blob/main/packages/twenty-cli/docs/commands.md';
+  'https://github.com/Negokap/twenty/blob/main/packages/twenty-cli/docs/commands.md';
 
 const StyledButtonContainer = styled.div`
   display: flex;

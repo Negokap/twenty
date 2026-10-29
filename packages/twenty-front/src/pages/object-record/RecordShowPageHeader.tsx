@@ -3,6 +3,7 @@ import { ObjectRecordShowPageBreadcrumb } from '@/object-record/record-show/comp
 import { RecordIdentifierBarTitle } from '@/object-record/record-show/components/RecordIdentifierBarTitle';
 import { RecordShowPageHeaderRecordTitle } from '@/object-record/record-show/components/RecordShowPageHeaderRecordTitle';
 import { type RecordShowPageHeaderTitleMode } from '@/object-record/record-show/types/RecordShowPageHeaderTitleMode';
+import { SetjooProjectLink } from '@/setjoo/components/SetjooProjectLink';
 import { useRecordShowPagePagination } from '@/object-record/record-show/hooks/useRecordShowPagePagination';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { PageCardHeader } from '@/ui/layout/page/components/PageCardHeader';
@@ -115,6 +116,10 @@ export const RecordShowPageHeader = ({
       titlePrefix={titlePrefix}
       titleAccessory={titleAccessory}
     >
+      <SetjooProjectLink
+        objectNameSingular={objectNameSingular}
+        objectRecordId={objectRecordId}
+      />
       {children}
     </RecordShowPageMainHeader>
   );

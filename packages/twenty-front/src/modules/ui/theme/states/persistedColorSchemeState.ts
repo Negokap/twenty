@@ -4,6 +4,6 @@ import { doNotTranslate } from 'twenty-shared/i18n';
 
 export const persistedColorSchemeState = createAtomState<ColorScheme>({
   key: 'persistedColorSchemeState',
-  defaultValue: doNotTranslate('System'),
+  defaultValue: doNotTranslate('Light'),
   useLocalStorage: true,
 });
