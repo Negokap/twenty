@@ -57,4 +57,4 @@ DB host, Redis) live in `docker-compose.yml`.
 - CodeBuild `crm-build`: GitHub `Negokap/twenty`, `aws/codebuild/standard:7.0`, privileged,
   `BUILD_GENERAL1_LARGE`, webhook PUSH on `^refs/heads/setjoo$`.
 - hst-2: `/opt/setjoo-crm` (owner deploy), nginx site `/etc/nginx/sites-available/crm.setjoo.com`
-  (HTTP only until the DNS record exists; then `sudo certbot --nginx -d crm.setjoo.com`).
+  with a Let's Encrypt cert (`certbot --nginx`, HTTP redirects to HTTPS, renewed by certbot.timer).
