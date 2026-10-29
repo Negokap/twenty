@@ -23,6 +23,11 @@ import {
   buildLinearApplicationPreferences,
   resetLinearApplicationPreferencesMocks,
 } from '~/pages/settings/accounts/__stories__/mockedLinearApplicationPreferences';
+import {
+  USER_HEALTH_CHECK_GRAPHQL_HANDLER,
+  hasDeclaredUserHealthCheck,
+  resetUserHealthCheckMocks,
+} from '~/pages/settings/accounts/__stories__/mockedUserHealthCheck';
 
 export const GRANOLA_USER_SETTINGS_FRONT_COMPONENT_ID =
   '20202020-1a2b-4c3d-8e4f-000000000051';
@@ -137,37 +142,12 @@ const maskStoredSecret = (storedValue: string | undefined) => {
 export const updateMyUserApplicationVariable = fn();
 export const findOneFrontComponent = fn();
 export const findApplicationsGatedQuery = fn();
-export const runMyApplicationHealthCheck = fn();
-
-type MockedUserHealthCheckResult = {
-  status: string;
-  title: string | null;
-  description: string | null;
-  action: { label: string; location: string | null } | null;
-};
-
-const userHealthCheckResultByApplicationId = new Map<
-  string,
-  MockedUserHealthCheckResult
->();
-
-export const declareUserHealthCheck = ({
-  applicationId,
-  result,
-}: {
-  applicationId: string;
-  result: MockedUserHealthCheckResult;
-}) => {
-  userHealthCheckResultByApplicationId.set(applicationId, result);
-};
 
 const buildApplicationPreferences = () => [
   {
     __typename: 'ApplicationPreferences',
     applicationId: FATHOM_APPLICATION_ID,
-    hasUserHealthCheck: userHealthCheckResultByApplicationId.has(
-      FATHOM_APPLICATION_ID,
-    ),
+    hasUserHealthCheck: hasDeclaredUserHealthCheck(FATHOM_APPLICATION_ID),
     connectionProviders: [FATHOM_CONNECTION_PROVIDER],
     settingsMenuItems: [],
     variables: [
@@ -198,9 +178,7 @@ const buildApplicationPreferences = () => [
   {
     __typename: 'ApplicationPreferences',
     applicationId: GRANOLA_APPLICATION_ID,
-    hasUserHealthCheck: userHealthCheckResultByApplicationId.has(
-      GRANOLA_APPLICATION_ID,
-    ),
+    hasUserHealthCheck: hasDeclaredUserHealthCheck(GRANOLA_APPLICATION_ID),
     connectionProviders: [],
     settingsMenuItems: [
       buildSettingsMenuItem({
@@ -265,27 +243,6 @@ export const failNextApplicationPreferencesRequest = () => {
   );
 };
 
-export const failNextUserHealthCheckRequest = () => {
-  getWorker().use(
-    graphql.mutation(
-      'RunMyApplicationHealthCheck',
-      ({ variables }) => {
-        runMyApplicationHealthCheck(variables);
-
-        return HttpResponse.json({
-          errors: [
-            {
-              message: 'Rate limit reached. Please try again later.',
-              extensions: { code: 'BAD_USER_INPUT', subCode: 'LIMIT_REACHED' },
-            },
-          ],
-        });
-      },
-      { once: true },
-    ),
-  );
-};
-
 export const failNextConnectedAccountsRequest = () => {
   getWorker().use(
     graphql.query(
@@ -325,32 +282,7 @@ export const APPLICATION_PREFERENCES_GRAPHQL_HANDLERS = [
       data: { updateMyUserApplicationVariable: true },
     });
   }),
-  graphql.mutation('RunMyApplicationHealthCheck', ({ variables }) => {
-    runMyApplicationHealthCheck(variables);
-
-    const result = userHealthCheckResultByApplicationId.get(
-      variables.applicationId,
-    );
-
-    if (!isDefined(result)) {
-      return HttpResponse.json({ data: { runMyApplicationHealthCheck: null } });
-    }
-
-    const { action, ...resultFields } = result;
-    const actionWithTypename = isDefined(action)
-      ? { __typename: 'ApplicationHealthCheckAction', ...action }
-      : null;
-
-    return HttpResponse.json({
-      data: {
-        runMyApplicationHealthCheck: {
-          __typename: 'ApplicationHealthCheckResult',
-          ...resultFields,
-          action: actionWithTypename,
-        },
-      },
-    });
-  }),
+  USER_HEALTH_CHECK_GRAPHQL_HANDLER,
   GENERATE_TRANSIENT_TOKEN_GRAPHQL_HANDLER,
   graphql.query('FindOneFrontComponent', ({ variables }) => {
     findOneFrontComponent(variables.id);
@@ -420,10 +352,9 @@ export const APPLICATION_PREFERENCES_DETAIL_GRAPHQL_HANDLERS = [
 export const seedApplicationPreferencesStory = async () => {
   savedValueByKey.clear();
   savedValueByKey.set('PERSONAL_API_KEY', SAVED_PERSONAL_API_KEY);
-  userHealthCheckResultByApplicationId.clear();
   resetLinearApplicationPreferencesMocks();
+  resetUserHealthCheckMocks();
   updateMyUserApplicationVariable.mockClear();
-  runMyApplicationHealthCheck.mockClear();
   findOneFrontComponent.mockClear();
   findApplicationsGatedQuery.mockClear();
 

@@ -22,16 +22,18 @@ import {
 import {
   APPLICATION_PREFERENCES_DETAIL_GRAPHQL_HANDLERS,
   GRANOLA_USER_SETTINGS_FRONT_COMPONENT_ID,
-  declareUserHealthCheck,
   failNextApplicationPreferencesRequest,
-  failNextUserHealthCheckRequest,
   stopApplicationForNextRequest,
   findApplicationsGatedQuery,
   findOneFrontComponent,
-  runMyApplicationHealthCheck,
   seedApplicationPreferencesStory,
   updateMyUserApplicationVariable,
 } from '~/pages/settings/accounts/__stories__/mockedApplicationPreferences';
+import {
+  declareUserHealthCheck,
+  failNextUserHealthCheckRequest,
+  runMyApplicationHealthCheck,
+} from '~/pages/settings/accounts/__stories__/mockedUserHealthCheck';
 
 const meta: Meta<PageDecoratorArgs> = {
   title: 'Pages/Settings/Accounts/SettingsApplicationPreferences',
