@@ -13,6 +13,17 @@ APP_VERSION=$(sed -nE "s/.*TWENTY_CURRENT_VERSION = '([^']+)'.*/\1/p" \
 sed -E 's#^FROM ([a-z0-9._-]+[:@])#FROM public.ecr.aws/docker/library/\1#' "$DOCKERFILE" > /tmp/Dockerfile.crm
 grep '^FROM' /tmp/Dockerfile.crm
 
+# Setjoo app launcher data, baked into the front bundle (the endpoint sends no CORS headers, so the browser can't fetch it).
+# On any failure the checked-in copy stays.
+apps_json=packages/twenty-front/src/modules/setjoo/constants/setjoo-applications.json
+if curl -fsS --max-time 20 https://auth.setjoo.com/api/v1/applications -o /tmp/setjoo-applications.json \
+  && python3 -c 'import json,sys; a=json.load(open(sys.argv[1]))["applications"]; assert a and all(x["publicHost"] for x in a)' /tmp/setjoo-applications.json \
+  && [ -d "$(dirname "$apps_json")" ]; then
+  cp /tmp/setjoo-applications.json "$apps_json" && echo "Launcher: fetched Setjoo applications"
+else
+  echo "WARNING: could not fetch Setjoo applications, using the checked-in copy"
+fi
+
 DOCKER_BUILDKIT=1 docker build -f /tmp/Dockerfile.crm --target twenty \
   --build-arg APP_VERSION="$APP_VERSION" -t "$ECR_REPO:twenty-$TAG" .
 docker run --rm --entrypoint sh "$ECR_REPO:twenty-$TAG" -c 'test -f dist/front/index.html' \
