@@ -76,6 +76,6 @@ export const THEME_COMMON = {
   clickableElementBackgroundTransition: 'background 0.1s ease',
   lastLayerZIndex: 2147483647,
   buttons: {
-    secondaryTextColor: '#F9C5C7',
+    secondaryTextColor: 'color(display-p3 0.909 0.575 0.579)',
   },
 };
