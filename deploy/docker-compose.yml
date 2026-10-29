@@ -1,0 +1,71 @@
+# Setjoo CRM on sj-app-prod-01 (hst-2), next to Plane. Postgres is external: twenty_app on
+# sj-db-prod-01 (hst-3) over WireGuard. Secrets come from ./.env (Infisical CRM/prod, see sync-env.sh).
+name: setjoo-crm
+
+x-twenty: &twenty
+  image: ${CRM_IMAGE:-crm}:twenty-${CRM_TAG:-local}
+  restart: always
+  env_file: .env
+  volumes:
+    - local-storage:/app/packages/twenty-server/.local-storage
+  depends_on:
+    redis:
+      condition: service_healthy
+
+x-twenty-env: &twenty-env
+  SERVER_URL: https://crm.setjoo.com
+  NODE_PORT: "3000"
+  # The password must be URL-safe (or percent-encoded): it is spliced into a URL.
+  PG_DATABASE_URL: postgres://twenty_app:${PG_DATABASE_PASSWORD}@10.10.0.3:5432/twenty_app
+  REDIS_URL: redis://redis:6379
+  STORAGE_TYPE: local
+  DISABLE_DB_MIGRATIONS: "true"
+  DISABLE_CRON_JOBS_REGISTRATION: "true"
+
+services:
+  server:
+    <<: *twenty
+    environment: *twenty-env
+    ports:
+      - "127.0.0.1:3010:3000"
+    mem_limit: 2g
+    healthcheck:
+      test: curl --fail http://localhost:3000/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    <<: *twenty
+    command: ["yarn", "worker:prod"]
+    environment: *twenty-env
+    mem_limit: 1536m
+
+  # One-off, run by deploy.sh before the swap: the image's entrypoint creates or upgrades
+  # the schema and registers cron jobs, then exits.
+  migrate:
+    <<: *twenty
+    restart: "no"
+    command: ["true"]
+    profiles: ["tools"]
+    environment:
+      <<: *twenty-env
+      DISABLE_DB_MIGRATIONS: "false"
+      DISABLE_CRON_JOBS_REGISTRATION: "false"
+
+  redis:
+    image: public.ecr.aws/docker/library/redis:7.4-alpine
+    restart: always
+    command: ["redis-server", "--maxmemory-policy", "noeviction", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  local-storage:
+  redis-data:
