@@ -1,5 +1,6 @@
 import { useRunApplicationHealthCheck } from '@/settings/applications/hooks/useRunApplicationHealthCheck';
 import { type ApplicationHealthCheckRunner } from '@/settings/applications/types/ApplicationHealthCheckRunner';
+import { shouldRecheckApplicationHealthAfterSave } from '@/settings/applications/utils/shouldRecheckApplicationHealthAfterSave';
 
 export const useSaveApplicationVariablesAndRecheckHealth = <TData>({
   applicationId,
@@ -20,12 +21,14 @@ export const useSaveApplicationVariablesAndRecheckHealth = <TData>({
   });
 
   const saveApplicationVariablesAndRecheckHealth = async () => {
-    const areApplicationVariablesSaved = await saveApplicationVariables();
+    const isSaved = await saveApplicationVariables();
 
     if (
-      !areApplicationVariablesSaved ||
-      !hasHealthCheck ||
-      hasMissingRequiredVariables
+      !shouldRecheckApplicationHealthAfterSave({
+        isSaved,
+        hasHealthCheck,
+        hasMissingRequiredVariables,
+      })
     ) {
       return;
     }
