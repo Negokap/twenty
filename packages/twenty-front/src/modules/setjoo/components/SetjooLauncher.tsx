@@ -77,7 +77,7 @@ const StyledScroll = styled.div`
 const StyledHeading = styled.p`
   color: ${themeCssVariables.font.color.tertiary};
   font-size: ${themeCssVariables.font.size.xs};
-  font-weight: ${themeCssVariables.font.weight.semi};
+  font-weight: ${themeCssVariables.font.weight.semiBold};
   letter-spacing: 0.16em;
   margin: ${themeCssVariables.spacing[3]} 0 ${themeCssVariables.spacing[1]};
   text-transform: uppercase;
@@ -125,7 +125,7 @@ const StyledMark = styled.span<{ isReady: boolean }>`
       : themeCssVariables.font.color.tertiary};
   display: flex;
   font-size: ${themeCssVariables.font.size.xs};
-  font-weight: ${themeCssVariables.font.weight.semi};
+  font-weight: ${themeCssVariables.font.weight.semiBold};
   height: 36px;
   justify-content: center;
   width: 36px;
