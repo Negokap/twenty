@@ -7,6 +7,7 @@ import {
 import { CollapsibleNavigationDrawerSection } from '@/ui/navigation/navigation-drawer/components/CollapsibleNavigationDrawerSection';
 import { NavigationDrawerItemGroup } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItemGroup';
 import { getNavigationSubItemLeftAdornment } from '@/ui/navigation/navigation-drawer/utils/getNavigationSubItemLeftAdornment';
+import { t } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
 import { matchPath, resolvePath, useLocation } from 'react-router-dom';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -16,6 +17,16 @@ const StyledSectionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledSourceCredit = styled.div`
+  color: ${themeCssVariables.font.color.tertiary};
+  font-size: ${themeCssVariables.font.size.xs};
+  padding: ${themeCssVariables.spacing[2]};
+`;
+
+const StyledSourceLink = styled.a`
+  color: inherit;
 `;
 
 const renderSectionItem = (
@@ -125,6 +136,14 @@ export const SettingsNavigationDrawerItems = () => {
           </CollapsibleNavigationDrawerSection>
         );
       })}
+      <StyledSourceCredit>
+        {t`Built on Twenty`} ·{' '}
+        <StyledSourceLink
+          href="https://github.com/Negokap/twenty"
+          target="_blank"
+          rel="noreferrer"
+        >{t`Source code`}</StyledSourceLink>
+      </StyledSourceCredit>
     </StyledSectionsContainer>
   );
 };

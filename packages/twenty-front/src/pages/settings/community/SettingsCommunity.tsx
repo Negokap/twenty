@@ -50,13 +50,13 @@ export const SettingsCommunity = () => {
 
   const socialLinks: SettingsCommunityLink[] = [
     {
-      href: 'https://discord.com/invite/cx5n4Jzs57',
+      href: 'https://setjoo.com',
       Icon: IconBrandDiscord,
       iconColor: themeCssVariables.color.blue9,
       cardTitle: t`Join our Discord`,
     },
     {
-      href: 'https://x.com/twentycrm',
+      href: 'https://setjoo.com',
       Icon: IconBrandX,
       iconColor: themeCssVariables.font.color.primary,
       cardTitle: t`Follow us on X`,
@@ -110,10 +110,10 @@ export const SettingsCommunity = () => {
         <Section.Root>
           <Section.Header
             title={t`Partners`}
-            description={t`Hire a partner to help you implement and customize Twenty.`}
+            description={t`Hire a partner to help you implement and customize Setjoo CRM.`}
           />
           <SettingsCard
-            href="https://twenty.com/partners/list"
+            href="https://setjoo.com"
             Icon={
               <IconBriefcase
                 size={theme.icon.size.md}
@@ -132,7 +132,7 @@ export const SettingsCommunity = () => {
           <StyledFeaturesContent>
             <SettingsLabContent />
             <SettingsCard
-              href="https://twenty.com/releases"
+              href="https://setjoo.com"
               Icon={
                 <IconTransform
                   size={theme.icon.size.md}

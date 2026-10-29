@@ -26,7 +26,7 @@ export const useColorScheme = () => {
   const { enqueueToast } = useToast();
 
   const colorScheme =
-    currentWorkspaceMember?.colorScheme ?? doNotTranslate('System');
+    currentWorkspaceMember?.colorScheme ?? doNotTranslate('Light');
 
   const setColorScheme = useCallback(
     async (value: ColorScheme) => {

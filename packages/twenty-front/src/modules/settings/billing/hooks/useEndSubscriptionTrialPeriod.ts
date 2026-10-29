@@ -162,7 +162,7 @@ export const useEndSubscriptionTrialPeriod = () => {
     } catch {
       enqueueToast({
         status: 'error',
-        children: t`Error while ending trial period. Please contact Twenty team.`,
+        children: t`Error while ending trial period. Please contact Setjoo team.`,
       });
       return { success: false };
     } finally {
