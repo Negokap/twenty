@@ -1,0 +1,40 @@
+# AWS CodeBuild: builds the Setjoo CRM (Twenty fork) image, pushes it to ECR,
+# then deploys to sj-app-prod-01 (hst-2) over SSH. Same shape as the Plane
+# pipeline; see deploy/README.md for the setup and how developers ship.
+#
+# Needs: CodeBuild project "crm-build" (PRIVILEGED, x86_64, BUILD_GENERAL1_LARGE:
+# the front build wants 8 GB of heap), ECR repo "crm", and the SSM SecureString
+# /crm/deploy-ssh-key (private key of deploy@hst-2).
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+    ECR_REGISTRY: "535391556744.dkr.ecr.us-east-1.amazonaws.com"
+    ECR_REPO: "535391556744.dkr.ecr.us-east-1.amazonaws.com/crm"
+    DEPLOY_HOST: "45.90.108.153"
+    DEPLOY_USER: "deploy"
+    DEPLOY_DIR: "/opt/setjoo-crm"
+  parameter-store:
+    DEPLOY_SSH_KEY: /crm/deploy-ssh-key
+
+phases:
+  pre_build:
+    commands:
+      - echo "Commit $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+  build:
+    commands:
+      - bash deploy/build.sh
+  post_build:
+    commands:
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" != "1" ]; then echo "Build failed, not deploying"; exit 1; fi
+      - mkdir -p ~/.ssh && printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+      - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+      - TAG="$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - SSH="ssh -i $HOME/.ssh/deploy $DEPLOY_USER@$DEPLOY_HOST"
+      - scp -i ~/.ssh/deploy deploy/docker-compose.yml deploy/deploy.sh deploy/sync-env.sh "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
+      # Short-lived ECR token over stdin, so the box needs no AWS credentials and the token never shows in a command line.
+      - aws ecr get-login-password --region "$AWS_REGION" | $SSH "sudo -n docker --config $DEPLOY_DIR/.docker login --username AWS --password-stdin $ECR_REGISTRY"
+      - $SSH "sudo -n env CRM_IMAGE=$ECR_REPO CRM_TAG=$TAG bash $DEPLOY_DIR/deploy.sh"
+      - echo "Deployed $TAG"
