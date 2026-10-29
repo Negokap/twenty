@@ -77,7 +77,7 @@ export const THEME_DARK: typeof THEME_LIGHT = {
   clickableElementBackgroundTransition: 'background 0.1s ease',
   lastLayerZIndex: 2147483647,
   buttons: {
-    secondaryTextColor: 'color(display-p3 0.63 0.69 1)',
+    secondaryTextColor: '#F9C5C7',
   },
   accent: {
     primary: 'color(display-p3 0.323 0.110 0.114)',
@@ -242,7 +242,7 @@ export const THEME_DARK: typeof THEME_LIGHT = {
       cyan: 'color(display-p3 0.446 0.79 0.887)',
       turquoise: 'color(display-p3 0.388 0.835 0.719)',
       sky: 'color(display-p3 0.536 0.772 0.924)',
-      blue: 'color(display-p3 0.63 0.69 1)',
+      blue: '#F9C5C7',
       jade: 'color(display-p3 0.4 0.835 0.656)',
       green: 'color(display-p3 0.434 0.828 0.573)',
       grass: 'color(display-p3 0.535 0.807 0.542)',
@@ -408,7 +408,7 @@ export const THEME_DARK: typeof THEME_LIGHT = {
     blue8: 'color(display-p3 0.285 0.362 0.674)',
     blue9: 'color(display-p3 0.276 0.384 0.837)',
     blue10: 'color(display-p3 0.354 0.445 0.866)',
-    blue11: 'color(display-p3 0.63 0.69 1)',
+    blue11: '#F9C5C7',
     blue12: 'color(display-p3 0.848 0.881 0.99)',
     purple1: 'color(display-p3 0.09 0.068 0.103)',
     purple2: 'color(display-p3 0.113 0.082 0.134)',
