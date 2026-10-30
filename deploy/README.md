@@ -57,4 +57,13 @@ DB host, Redis) live in `docker-compose.yml`.
 - CodeBuild `crm-build`: GitHub `Negokap/twenty`, `aws/codebuild/standard:7.0`, privileged,
   `BUILD_GENERAL1_LARGE`, webhook PUSH on `^refs/heads/setjoo$`.
 - hst-2: `/opt/setjoo-crm` (owner deploy), nginx site `/etc/nginx/sites-available/crm.setjoo.com`
-  with a Let's Encrypt cert (`certbot --nginx`, HTTP redirects to HTTPS, renewed by certbot.timer).
+  serving `crm.setjoo.com` and `*.crm.setjoo.com` (`/` on the bare name redirects to `app.crm.setjoo.com`).
+  Wildcard Let's Encrypt cert `crm.setjoo.com` + `*.crm.setjoo.com` via DNS-01 (`certbot-dns-google`,
+  service account key `/root/.secrets/certbot-dns-google.json`, renewed by certbot.timer).
+- DNS (Google Cloud DNS, zone setjoo.com): `crm` and `*.crm` A 45.90.108.153.
+
+## Workspaces
+
+Multi-workspace mode: each Setjoo account that signs in creates its own private workspace at
+`<subdomain>.crm.setjoo.com` (Setjoo's own is `setjoo.crm.setjoo.com`). Teammates join a workspace by
+invitation (Settings → Members).
