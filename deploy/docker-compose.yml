@@ -14,6 +14,11 @@ x-twenty: &twenty
 
 x-twenty-env: &twenty-env
   SERVER_URL: https://crm.setjoo.com
+  # Every Setjoo account gets its own workspace at <subdomain>.crm.setjoo.com; new users start on
+  # app.crm.setjoo.com. Needs the *.crm.setjoo.com DNS record and wildcard cert (deploy/README.md).
+  IS_MULTIWORKSPACE_ENABLED: "true"
+  DEFAULT_SUBDOMAIN: app
+  IS_WORKSPACE_CREATION_LIMITED_TO_SERVER_ADMINS: "false"
   NODE_PORT: "3000"
   # The password must be URL-safe (or percent-encoded): it is spliced into a URL.
   PG_DATABASE_URL: postgres://twenty_app:${PG_DATABASE_PASSWORD}@10.10.0.3:5432/twenty_app
