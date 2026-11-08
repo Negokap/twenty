@@ -31,6 +31,7 @@ import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceSta
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { returnToPathState } from '@/auth/states/returnToPathState';
+import { SETJOO_AUTO_SSO_DISABLED_KEY } from '@/auth/sign-in-up/constants/SetjooAutoSsoDisabledKey';
 import { clearSessionLocalStorageKeys } from '@/auth/utils/clearSessionLocalStorageKeys';
 import { broadcastSignOutToOtherTabs } from '@/auth/utils/crossTabSignOut';
 import { clearSessionGeneration } from '@/auth/utils/clearSessionGeneration';
@@ -127,6 +128,8 @@ export const useAuth = () => {
     // The assign below is the only navigation: keep the redirect effect from racing it to the sign-in page.
     store.set(isAppEffectRedirectEnabledState.atom, false);
     sessionStorage.clear();
+    // Sign-out must land on the login page, not bounce straight back through Setjoo SSO.
+    sessionStorage.setItem(SETJOO_AUTO_SSO_DISABLED_KEY, '1');
     store.set(isCookieAuthActiveState.atom, false);
     store.set(currentUserState.atom, null);
     store.set(currentWorkspaceState.atom, null);
