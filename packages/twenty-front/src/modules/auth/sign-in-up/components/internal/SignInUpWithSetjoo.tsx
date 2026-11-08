@@ -10,7 +10,9 @@ import { AuthenticatedMethod } from '@/auth/types/AuthenticatedMethod';
 import { type SocialSsoSignInUpActionType } from '@/auth/types/SocialSsoSignInUpActionType';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { SETJOO_AUTO_SSO_DISABLED_KEY } from '@/auth/sign-in-up/constants/SetjooAutoSsoDisabledKey';
 import { useLingui } from '@lingui/react/macro';
+import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { MainButton } from 'twenty-ui/components/input';
 import { IconLock } from 'twenty-ui/icon';
@@ -48,6 +50,23 @@ export const SignInUpWithSetjoo = ({
       action,
     });
   };
+
+  // Start SSO immediately, once per tab, unless an error, sign-out, invite or ?local=1 says otherwise.
+  useEffect(() => {
+    if (
+      searchParams.has('local') ||
+      searchParams.has('errorMessage') ||
+      searchParams.has('error') ||
+      searchParams.has('inviteToken') ||
+      workspaceInviteHash !== undefined ||
+      sessionStorage.getItem(SETJOO_AUTO_SSO_DISABLED_KEY) !== null
+    ) {
+      return;
+    }
+    sessionStorage.setItem(SETJOO_AUTO_SSO_DISABLED_KEY, '1');
+    handleClick();
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isLastUsed = lastAuthenticatedMethod === AuthenticatedMethod.SETJOO;
 
