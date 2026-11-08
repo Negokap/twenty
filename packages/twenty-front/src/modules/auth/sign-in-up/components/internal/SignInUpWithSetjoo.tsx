@@ -10,7 +10,10 @@ import { AuthenticatedMethod } from '@/auth/types/AuthenticatedMethod';
 import { type SocialSsoSignInUpActionType } from '@/auth/types/SocialSsoSignInUpActionType';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { SETJOO_AUTO_SSO_DISABLED_KEY } from '@/auth/sign-in-up/constants/SetjooAutoSsoDisabledKey';
+import {
+  SETJOO_AUTO_SSO_DISABLED_KEY,
+  SETJOO_SIGNED_OUT_KEY,
+} from '@/auth/sign-in-up/constants/SetjooAutoSsoDisabledKey';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -41,6 +44,7 @@ export const SignInUpWithSetjoo = ({
   const hasMultipleAuthMethods = useHasMultipleAuthMethods();
 
   const handleClick = () => {
+    localStorage.removeItem(SETJOO_SIGNED_OUT_KEY);
     setLastAuthenticatedMethod(AuthenticatedMethod.SETJOO);
     signInWithSetjoo({
       workspaceInviteHash,
@@ -59,7 +63,8 @@ export const SignInUpWithSetjoo = ({
       searchParams.has('error') ||
       searchParams.has('inviteToken') ||
       workspaceInviteHash !== undefined ||
-      sessionStorage.getItem(SETJOO_AUTO_SSO_DISABLED_KEY) !== null
+      sessionStorage.getItem(SETJOO_AUTO_SSO_DISABLED_KEY) !== null ||
+      localStorage.getItem(SETJOO_SIGNED_OUT_KEY) !== null
     ) {
       return;
     }
